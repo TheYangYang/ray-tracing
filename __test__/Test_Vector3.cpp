@@ -1,4 +1,3 @@
-#pragma once
 #include "math/Vector3.h"
 #include "math/Utils.h"
 #include <iostream>
@@ -158,7 +157,7 @@ void TestNormalize()
     ASSERT_TRUE(Equal(norm.Magnitude(), static_cast<T>(1)), "Normalize failed: magnitude is not 1");
 }
 
-static void RunTests()
+void RunTests()
 {
     RUN_TEST(TestConstructor<float>);
     RUN_TEST(TestNegate<float>);
@@ -172,4 +171,10 @@ static void RunTests()
     RUN_TEST(TestNormalize<float>);
 
     std::cout << "All tests passed successfully!\n";
+}
+
+int main()
+{
+    RunTests();
+    return 0;
 }

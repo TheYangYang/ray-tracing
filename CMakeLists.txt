@@ -8,18 +8,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Add Include Directories
-include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/__test__)
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Collect all source files
-file(GLOB_RECURSE MATH_SOURCES "math/*.cpp")
-file(GLOB_RECURSE TEST_SOURCES "__test__/*.cpp")
 file(GLOB_RECURSE SRC_SOURCES "src/*.cpp")
-file(GLOB_RECURSE INCLUDE_SOURCES "include/*.h")
+file(GLOB_RECURSE TEST_SOURCES "__test__/*.cpp")
 
-# Add Executable (Ensure tests are included)
-add_executable(rayTracing 
-    ${MATH_SOURCES} 
-    ${TEST_SOURCES}
-    ${INCLUDE_SOURCES}
-    ${SRC_SOURCES}
-)
+# Add Main Executable
+add_executable(rayTracing ${SRC_SOURCES})
+
+# Add Test Executable (Only includes test files)
+add_executable(rayTracingTests ${TEST_SOURCES})
+
