@@ -14,9 +14,15 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 file(GLOB_RECURSE SRC_SOURCES "src/*.cpp")
 file(GLOB_RECURSE TEST_SOURCES "__test__/*.cpp")
 
+# Add the PCH file and source
+add_library(pch STATIC src/pch.cpp)
+
 # Add Main Executable
 add_executable(rayTracing ${SRC_SOURCES})
 
-# Add Test Executable (Only includes test files)
+# Add Test Executable 
 add_executable(rayTracingTests ${TEST_SOURCES})
 
+# Link libraries
+target_link_libraries(rayTracing pch)
+target_link_libraries(rayTracingTests pch)
