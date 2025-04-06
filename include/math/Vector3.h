@@ -3,15 +3,14 @@
 
 namespace math
 {
-    template <typename T>
     class Vector3
     {
     public:
-        T x, y, z;
+        float x, y, z;
 
         Vector3() : x(0), y(0), z(0) {};
-        Vector3(T value) : x(value), y(value), z(value) {};
-        Vector3(T x, T y, T z) : x(x), y(y), z(z) {};
+        Vector3(float value) : x(value), y(value), z(value) {};
+        Vector3(float x, float y, float z) : x(x), y(y), z(z) {};
         ~Vector3() = default;
 
         Vector3 &operator=(const Vector3 &) = default;
@@ -32,17 +31,17 @@ namespace math
             return Vector3(x - other.x, y - other.y, z - other.z);
         }
 
-        Vector3 operator/(const T scalar) const
+        Vector3 operator/(const float scalar) const
         {
             return Vector3(x / scalar, y / scalar, z / scalar);
         }
 
-        Vector3 operator*(const T scalar) const
+        Vector3 operator*(const float scalar) const
         {
             return Vector3(x * scalar, y * scalar, z * scalar);
         }
 
-        friend Vector3 operator*(const T scalar, const Vector3 &v)
+        friend Vector3 operator*(const float scalar, const Vector3 &v)
         {
             return Vector3(v.x * scalar, v.y * scalar, v.z * scalar);
         }
@@ -79,14 +78,14 @@ namespace math
             return *this;
         }
 
-        T Magnitude() const
+        float Magnitude() const
         {
             return std::sqrt(x * x + y * y + z * z);
         }
 
         Vector3 Normalized() const
         {
-            T mag = Magnitude();
+            float mag = Magnitude();
             return *this / mag;
         }
 

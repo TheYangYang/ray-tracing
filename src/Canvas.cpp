@@ -19,12 +19,12 @@ void Canvas::Initialize(uint32_t width, uint32_t height, Camera camera)
     this->camera = camera;
     viewportHeight = 2.0f;
     viewportWidth = viewportHeight * GetAspectRatio();
-    viewportU = math::Vector3<float>(viewportWidth, 0, 0);
-    viewportV = math::Vector3<float>(0, -viewportHeight, 0);
+    viewportU = math::Vector3(viewportWidth, 0, 0);
+    viewportV = math::Vector3(0, -viewportHeight, 0);
     pixelDeltaU = viewportU / width;
     pixelDeltaV = viewportV / height;
 
-    math::Vector3<float> viewportUpperLeft = camera.GetCameraCenter() - math::Vector3<float>(0, 0, camera.GetFocalLength()) - viewportU / 2 - viewportV / 2;
+    math::Vector3 viewportUpperLeft = camera.GetCameraCenter() - math::Vector3(0, 0, camera.GetFocalLength()) - viewportU / 2 - viewportV / 2;
     pixelPosition = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
 }
 
@@ -32,7 +32,7 @@ void Canvas::Initialize(uint32_t width, uint32_t height, Camera camera)
 
 void Canvas::Draw(std::vector<uint8_t> &framebuffer)
 {
-    const math::Vector3<float> cameraCenter = camera.GetCameraCenter();
+    const math::Vector3 cameraCenter = camera.GetCameraCenter();
     const size_t pixelCount = width * height;
 
     std::vector<size_t> indices(pixelCount);
@@ -42,11 +42,11 @@ void Canvas::Draw(std::vector<uint8_t> &framebuffer)
         const size_t j = index / width;
         const size_t i = index % width;
 
-        math::Vector3<float> pixelCenter = pixelPosition + (i * pixelDeltaU) + (j * pixelDeltaV);
-        math::Vector3<float> rayDirection = pixelCenter - cameraCenter;
+        math::Vector3 pixelCenter = pixelPosition + (i * pixelDeltaU) + (j * pixelDeltaV);
+        math::Vector3 rayDirection = pixelCenter - cameraCenter;
 
         Ray ray(cameraCenter, rayDirection);
-        math::Vector3<float> color = RayColor(ray);
+        math::Vector3 color = RayColor(ray);
 
         uint8_t r = static_cast<uint8_t>(std::clamp(color.x, 0.0f, 1.0f) * 255.999f);
         uint8_t g = static_cast<uint8_t>(std::clamp(color.y, 0.0f, 1.0f) * 255.999f);
@@ -62,15 +62,15 @@ void Canvas::Draw(std::vector<uint8_t> &framebuffer)
 }
 
 
-math::Vector3<float> Canvas::RayColor(const Ray &r)
+math::Vector3 Canvas::RayColor(const Ray &r)
 {
-    if (Renderer::Sphere(math::Vector3<float>(0, 0, -1), 0.5f, r))
+    if (Renderer::Sphere(math::Vector3(0, 0, -1), 0.5f, r))
     {
-        return math::Vector3<float>(1.0f, 0.0f, 0.0f);
+        return math::Vector3(1.0f, 0.0f, 0.0f);
     }
 
-    math::Vector3<float> unitDirection = r.GetDirection().Normalized();
+    math::Vector3 unitDirection = r.GetDirection().Normalized();
     float a = 0.5f * (unitDirection.y + 1.0f);
 
-    return (1.0f - a) * math::Vector3<float>(1.0f) + a * math::Vector3<float>(0.5f, 0.7f, 1.0f);
+    return (1.0f - a) * math::Vector3(1.0f) + a * math::Vector3(0.5f, 0.7f, 1.0f);
 }
