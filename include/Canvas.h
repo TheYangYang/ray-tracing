@@ -1,6 +1,5 @@
 #pragma once
 #include "pch.h"
-#include <iostream>
 #include "math/Vector3.h"
 #include "Camera.h"
 #include "Ray.h"
@@ -21,7 +20,7 @@ public:
     Canvas &operator=(const Canvas &) = delete;
     Canvas(const Canvas &) = delete;
 
-    math::Vector3<float> RayColor(const Ray &r);
+    math::Vector3 RayColor(const Ray &r);
 
 public:
     uint32_t width;
@@ -30,13 +29,13 @@ public:
     float viewportWidth;
     float viewportHeight;
 
-    math::Vector3<float> viewportU;
-    math::Vector3<float> viewportV;
+    math::Vector3 viewportU;
+    math::Vector3 viewportV;
 
-    math::Vector3<float> pixelDeltaU;
-    math::Vector3<float> pixelDeltaV;
+    math::Vector3 pixelDeltaU;
+    math::Vector3 pixelDeltaV;
 
     Camera camera;
 
-    math::Vector3<float> pixelPosition;
+    math::Vector3 pixelPosition;
 };
