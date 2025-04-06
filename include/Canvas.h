@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include <iostream>
 #include "math/Vector3.h"
 #include "Camera.h"
@@ -7,36 +8,38 @@
 class Canvas
 {
 public:
-    static Canvas &GetInstance(uint32_t width, uint32_t height, Camera& camera);
+    static Canvas &GetInstance(uint32_t width, uint32_t height, Camera &camera);
     ~Canvas();
 
-    const uint32_t GetWidth() const { return m_Width; }
-    const uint32_t GetHeight() const { return m_Height; }
+    const uint32_t GetWidth() const { return width; }
+    const uint32_t GetHeight() const { return height; }
     void Draw();
-    const float GetAspectRatio() const { return m_Width / static_cast<float>(m_Height); }
+    const float GetAspectRatio() const { return width / static_cast<float>(height); }
 
-private:
+public:
     Canvas() = delete;
-    Canvas(uint32_t width, uint32_t height, Camera& camera);
+    Canvas(uint32_t width, uint32_t height, Camera &camera);
     Canvas &operator=(const Canvas &) = delete;
     Canvas(const Canvas &) = delete;
-    void writeColor(std::ofstream& file, const math::Vector3<float>& color);
-    math::Vector3<float> RayColor(const Ray& r);
 
-private:
-    uint32_t m_Width;
-    uint32_t m_Height;
+    void writeColor(std::ofstream &file, const math::Vector3<float> &color);
+    math::Vector3<float> RayColor(const Ray &r);
 
-    float m_ViewportWidth;
-    float m_ViewportHeight;
+public:
+    uint32_t width;
+    uint32_t height;
+    std::vector<uint8_t> framebuffer;
 
-    math::Vector3<float> m_ViewportU;
-    math::Vector3<float> m_ViewportV;
+    float viewportWidth;
+    float viewportHeight;
 
-    math::Vector3<float> m_PixelDeltaU;
-    math::Vector3<float> m_PixelDeltaV;
+    math::Vector3<float> viewportU;
+    math::Vector3<float> viewportV;
 
-    Camera& m_Camera;
+    math::Vector3<float> pixelDeltaU;
+    math::Vector3<float> pixelDeltaV;
 
-    math::Vector3<float> m_PixelPosition;
+    Camera &camera;
+
+    math::Vector3<float> pixelPosition;
 };
