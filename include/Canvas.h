@@ -8,27 +8,24 @@
 class Canvas
 {
 public:
-    static Canvas &GetInstance(uint32_t width, uint32_t height, Camera &camera);
+    static Canvas &GetInstance();
     ~Canvas();
 
     const uint32_t GetWidth() const { return width; }
     const uint32_t GetHeight() const { return height; }
-    void Draw();
+    void Draw(std::vector<uint8_t>& framebuffer);
     const float GetAspectRatio() const { return width / static_cast<float>(height); }
-
+    void Initialize(uint32_t width, uint32_t height, Camera camera);
 public:
-    Canvas() = delete;
-    Canvas(uint32_t width, uint32_t height, Camera &camera);
+    Canvas() = default;
     Canvas &operator=(const Canvas &) = delete;
     Canvas(const Canvas &) = delete;
 
-    void writeColor(std::ofstream &file, const math::Vector3<float> &color);
     math::Vector3<float> RayColor(const Ray &r);
 
 public:
     uint32_t width;
     uint32_t height;
-    std::vector<uint8_t> framebuffer;
 
     float viewportWidth;
     float viewportHeight;
@@ -39,7 +36,7 @@ public:
     math::Vector3<float> pixelDeltaU;
     math::Vector3<float> pixelDeltaV;
 
-    Camera &camera;
+    Camera camera;
 
     math::Vector3<float> pixelPosition;
 };

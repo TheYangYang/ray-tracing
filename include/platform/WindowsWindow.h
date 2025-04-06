@@ -16,7 +16,6 @@ private:
     HWND hwnd;
     LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    std::vector<uint8_t> pixelData; // RGB
-    void RenderScene();
+    std::vector<uint8_t> pixelData; 
     void BlitToWindow(HDC hdc);
 };

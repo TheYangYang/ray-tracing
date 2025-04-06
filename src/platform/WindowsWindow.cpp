@@ -2,13 +2,16 @@
 #define UNICODE
 
 WindowsWindow::WindowsWindow(uint32_t width, uint32_t height, const std::wstring &title, Platform platform)
-    : Window(width, height, title, platform), pixelData(width * height * 4)
+    : Window(width, height, title, platform), pixelData(width * height * RGBA_NUM)
 {
+    Canvas::GetInstance().Initialize(width, height, Camera());
     const wchar_t CLASS_NAME[] = L"MyWindowClass";
     WNDCLASS wc = {};
-    wc.lpfnWndProc = [](HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT {
-        WindowsWindow* window = reinterpret_cast<WindowsWindow*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-        if (window) {
+    wc.lpfnWndProc = [](HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT
+    {
+        WindowsWindow *window = reinterpret_cast<WindowsWindow *>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+        if (window)
+        {
             return window->WindowProc(hwnd, msg, wParam, lParam);
         }
         return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -49,30 +52,19 @@ LRESULT WindowsWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
     else if (msg == WM_PAINT)
     {
         // Handle drawing on the window
-        HDC hdc = GetDC(hwnd); // Get device context
+        HDC hdc = GetDC(hwnd); 
 
         // Render the scene
-        RenderScene();
-        
+        auto& canvas = Canvas::GetInstance();
+        canvas.Draw(pixelData);
+
         // Blit pixel data to the window
         BlitToWindow(hdc);
 
-        ReleaseDC(hwnd, hdc); // Release device context after drawing
+        ReleaseDC(hwnd, hdc); 
         return 0;
     }
     return DefWindowProc(hwnd, msg, wParam, lParam);
-}
-
-void WindowsWindow::RenderScene()
-{
-    for (size_t i = 0; i < specification.width * specification.height; i++)
-    {
-        pixelData[i * 4 + 0] = 0;  // Red channel
-        pixelData[i * 4 + 1] = 0;    // Green channel
-        pixelData[i * 4 + 2] = 255;    // Blue channel
-        pixelData[i * 4 + 3] = 255;  // Alpha channel (255 = fully opaque)
-    }
-    
 }
 
 void WindowsWindow::BlitToWindow(HDC hdc)
@@ -80,9 +72,9 @@ void WindowsWindow::BlitToWindow(HDC hdc)
     BITMAPINFO bmi = {};
     bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bmi.bmiHeader.biWidth = specification.width;
-    bmi.bmiHeader.biHeight = -static_cast<int>(specification.height); 
+    bmi.bmiHeader.biHeight = -static_cast<int>(specification.height);
     bmi.bmiHeader.biPlanes = 1;
-    bmi.bmiHeader.biBitCount = 32; 
+    bmi.bmiHeader.biBitCount = 32;
     bmi.bmiHeader.biCompression = BI_RGB;
 
     SetDIBitsToDevice(hdc, 0, 0, specification.width, specification.height, 0, 0, 0, specification.height, pixelData.data(), &bmi, DIB_RGB_COLORS);
