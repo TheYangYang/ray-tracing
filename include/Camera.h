@@ -7,10 +7,10 @@ public:
     Camera();
     ~Camera();
 
-    const math::Vector3 &GetCameraCenter() const { return m_CameraCenter; }
-    float GetFocalLength() const { return m_FocalLength; }
+    const math::Vector3 &GetCameraCenter() const { return cameraCenter; }
+    float GetFocalLength() const { return focalLength; }
 
 private:
-    math::Vector3 m_CameraCenter;
-    float m_FocalLength;
+    math::Vector3 cameraCenter;
+    float focalLength;
 };
