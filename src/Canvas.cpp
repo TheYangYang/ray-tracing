@@ -28,17 +28,16 @@ void Canvas::Initialize(uint32_t width, uint32_t height, Camera camera)
     pixelPosition = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
 }
 
-
-
 void Canvas::Draw(std::vector<uint8_t> &framebuffer)
 {
     const math::Vector3 cameraCenter = camera.GetCameraCenter();
     const size_t pixelCount = width * height;
 
     std::vector<size_t> indices(pixelCount);
-    std::iota(indices.begin(), indices.end(), 0); 
+    std::iota(indices.begin(), indices.end(), 0);
 
-    std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t index) {
+    std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t index)
+                  {
         const size_t j = index / width;
         const size_t i = index % width;
 
@@ -54,23 +53,23 @@ void Canvas::Draw(std::vector<uint8_t> &framebuffer)
         uint8_t a = 255;
 
         size_t pixelOffset = index * 4;
-        framebuffer[pixelOffset + 0] = r;
+        // order is b g r a
+        framebuffer[pixelOffset + 0] = b;
         framebuffer[pixelOffset + 1] = g;
-        framebuffer[pixelOffset + 2] = b;
-        framebuffer[pixelOffset + 3] = a;
-    });
+        framebuffer[pixelOffset + 2] = r;
+        framebuffer[pixelOffset + 3] = a; });
 }
-
 
 math::Vector3 Canvas::RayColor(const Ray &r)
 {
-    if (Renderer::Sphere(math::Vector3(0, 0, -1), 0.5f, r))
+    float t = Renderer::Sphere(math::Vector3(0, 0, -1), 0.5, r);
+    if (t > 0.0)
     {
-        return math::Vector3(1.0f, 0.0f, 0.0f);
+        math::Vector3 N = (r.At(t) - math::Vector3(0, 0, -1)).Normalized();
+        return 0.5 * math::Vector3(N.x + 1, N.y + 1, N.z + 1);
     }
 
     math::Vector3 unitDirection = r.GetDirection().Normalized();
-    float a = 0.5f * (unitDirection.y + 1.0f);
-
-    return (1.0f - a) * math::Vector3(1.0f) + a * math::Vector3(0.5f, 0.7f, 1.0f);
+    auto a = 0.5 * (unitDirection.y + 1.0);
+    return (1.0 - a) * math::Vector3(1.0, 1.0, 1.0) + a * math::Vector3(0.5, 0.7, 1.0);
 }
