@@ -1,16 +1,16 @@
 #include "renderer/RendererList.h"
 
-RendererList::RendererList(std::shared_ptr<Renderer> renderer)
+RendererList::RendererList(Ref<Renderer> renderer)
 {
     AddRenderer(renderer);
 }
 
-void RendererList::AddRenderer(std::shared_ptr<Renderer> renderer)
+void RendererList::AddRenderer(Ref<Renderer> renderer)
 {
     renderers.push_back(renderer);
 }
 
-bool RendererList::Hit(const Ray& ray, float rayTMin, float rayTMax, HitInfo& info) const 
+bool RendererList::Hit(const Ray& ray, float rayTMin, float rayTMax, HitInfo& hitInfo) const 
 {
     HitInfo tempHitInfo;
     bool isHitting = false;
@@ -22,7 +22,7 @@ bool RendererList::Hit(const Ray& ray, float rayTMin, float rayTMax, HitInfo& in
         {
             isHitting = true;
             closest = tempHitInfo.t;
-            info = tempHitInfo;
+            hitInfo = tempHitInfo;
         }
     }
 

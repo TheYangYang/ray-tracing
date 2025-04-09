@@ -2,13 +2,13 @@
 #include "Vector3.h"
 namespace math
 {
-
-    static float dot(const Vector3 &first, const Vector3 &second)
+ 
+    static float dot(const Vector3 &first, const Vector3 &second) noexcept
     {
         return first.x * second.x + first.y * second.y + first.z * second.z;
     }
 
-    static Vector3 cross(const Vector3 &first, const Vector3 &second) 
+    static Vector3 cross(const Vector3 &first, const Vector3 &second) noexcept
     {
         return Vector3(
             first.y * second.z - first.z * second.y,
