@@ -1,42 +1,52 @@
 #pragma once
-#include <iostream>
-#include "math/Vector3.h"
+#include "pch.h"
 #include "Camera.h"
 #include "Ray.h"
+
+#include "renderer/RendererList.h"
+#include "renderer/Sphere.h"
 
 class Canvas
 {
 public:
-    static Canvas &GetInstance(uint32_t width, uint32_t height, Camera& camera);
+    static Canvas &GetInstance();
     ~Canvas();
 
-    const uint32_t GetWidth() const { return m_Width; }
-    const uint32_t GetHeight() const { return m_Height; }
-    void Draw();
-    const float GetAspectRatio() const { return m_Width / static_cast<float>(m_Height); }
-
-private:
-    Canvas() = delete;
-    Canvas(uint32_t width, uint32_t height, Camera& camera);
+    const uint32_t GetWidth() const { return width; }
+    const uint32_t GetHeight() const { return height; }
+    void Draw(std::vector<uint8_t>& framebuffer);
+    const float GetAspectRatio() const { return width / static_cast<float>(height); }
+    void Initialize(uint32_t width, uint32_t height, Camera camera);
+public:
+    Canvas() = default;
     Canvas &operator=(const Canvas &) = delete;
     Canvas(const Canvas &) = delete;
-    void writeColor(std::ofstream& file, const math::Vector3<float>& color);
-    math::Vector3<float> RayColor(const Ray& r);
 
-private:
-    uint32_t m_Width;
-    uint32_t m_Height;
+    math::Vector3 RayColor(const Ray &r, int bounces);
 
-    float m_ViewportWidth;
-    float m_ViewportHeight;
+public:
+    uint32_t width;
+    uint32_t height;
 
-    math::Vector3<float> m_ViewportU;
-    math::Vector3<float> m_ViewportV;
+    float viewportWidth;
+    float viewportHeight;
 
-    math::Vector3<float> m_PixelDeltaU;
-    math::Vector3<float> m_PixelDeltaV;
+    math::Vector3 viewportU;
+    math::Vector3 viewportV;
 
-    Camera& m_Camera;
+    math::Vector3 pixelDeltaU;
+    math::Vector3 pixelDeltaV;
 
-    math::Vector3<float> m_PixelPosition;
+    Camera camera;
+
+    math::Vector3 pixelPosition;
+
+
+    RendererList world;
+
+    int bounces = 5;
+
+    std::vector<uint32_t> framebufferCache;
+    int frameNum = 1;
+
 };

@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 Camera::Camera()
-    : m_CameraCenter(math::Vector3<float>(0)), m_FocalLength(1.0f)
+    : cameraCenter(math::Vector3(0)), focalLength(1.0f)
 {
 }
 

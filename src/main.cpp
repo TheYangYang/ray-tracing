@@ -1,13 +1,28 @@
-#include "Canvas.h"
-#include "math/Vector3.h"
+#ifdef _WIN32
+#include "platform/WindowsWindow.h"
+#elif __linux__
+#include "platform/LinuxWindow.h"
+#endif
 
-constexpr uint32_t CANVAS_WIDTH = 256;
-constexpr uint32_t CANVAS_HEIGHT = 256;
+constexpr uint32_t WIDTH = 800;
+constexpr uint32_t HEIGHT = 600;
+const std::wstring TITLE = L"Ray-Tracing";
 
-int main()
+#ifdef _WIN32
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int)
 {
-    Camera Camera;
-    auto &canvas = Canvas::GetInstance(CANVAS_WIDTH, CANVAS_HEIGHT, Camera);
-    canvas.Draw();
+    Scope<platform::Window> window = SCOPE(WindowsWindow, WIDTH, HEIGHT, TITLE, platform::Platform::WINDOWS);
+    window->Run();
     return 0;
 }
+#else
+int main()
+{
+#ifdef __linux__
+    Scope<platform::Window> window = SCOPE(LinuxWindow, WIDTH, HEIGHT, TITLE, platform::Platform::LINUX);
+    window->Run();
+#elif __APPLE__
+#endif
+    return 0;
+}
+#endif

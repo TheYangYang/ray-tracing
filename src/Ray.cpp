@@ -1,13 +1,13 @@
 #include "Ray.h"
 
 Ray::Ray()
-    : m_Origin(math::Vector3<float>()), m_Direction(math::Vector3<float>())
+    : origin(math::Vector3()), direction(math::Vector3())
 {
 
 }
 
-Ray::Ray(const math::Vector3<float>& origin, const math::Vector3<float>& direction)
-    :m_Origin(origin), m_Direction(direction)
+Ray::Ray(const math::Vector3& origin, const math::Vector3& direction)
+    :origin(origin), direction(direction)
 {
 
 }

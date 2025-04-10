@@ -1,10 +1,8 @@
 #include "Canvas.h"
-#include <fstream>
-#include "Renderer.h"
 
-Canvas &Canvas::GetInstance(uint32_t width, uint32_t height, Camera &camera)
+Canvas &Canvas::GetInstance()
 {
-    static Canvas canvasInstance(width, height, camera);
+    static Canvas canvasInstance;
     return canvasInstance;
 }
 
@@ -12,70 +10,83 @@ Canvas::~Canvas()
 {
 }
 
-Canvas::Canvas(uint32_t width, uint32_t height, Camera &camera)
-    : m_Width(width), m_Height(height), m_ViewportHeight(2.0f), m_Camera(camera)
+void Canvas::Initialize(uint32_t width, uint32_t height, Camera camera)
 {
-    m_ViewportWidth = m_ViewportHeight * GetAspectRatio();
-    m_ViewportU = math::Vector3<float>(m_ViewportWidth, 0, 0);
-    m_ViewportV = math::Vector3<float>(0, -m_ViewportHeight, 0);
-    m_PixelDeltaU = m_ViewportU / m_Width;
-    m_PixelDeltaV = m_ViewportV / m_Height;
+    this->width = width;
+    this->height = height;
+    this->camera = camera;
+    viewportHeight = 2.0f;
+    viewportWidth = viewportHeight * GetAspectRatio();
+    viewportU = math::Vector3(viewportWidth, 0, 0);
+    viewportV = math::Vector3(0, -viewportHeight, 0);
+    pixelDeltaU = viewportU / width;
+    pixelDeltaV = viewportV / height;
 
-    math::Vector3<float> viewportUpperLeft = camera.GetCameraCenter() - math::Vector3<float>(0, 0, camera.GetFocalLength()) - m_ViewportU / 2 - m_ViewportV / 2;
-    m_PixelPosition = viewportUpperLeft + 0.5 * (m_PixelDeltaU + m_PixelDeltaV);
+    math::Vector3 viewportUpperLeft = camera.GetCameraCenter() - math::Vector3(0, 0, camera.GetFocalLength()) - viewportU / 2 - viewportV / 2;
+    pixelPosition = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
+
+    // Initialize the world
+    world.AddRenderer(REF_AS(Renderer, Sphere, math::Vector3(0, 0, -1), 0.5f));
+    world.AddRenderer(REF_AS(Renderer, Sphere, math::Vector3(0, -100.5, -1), 100));
+
+    framebufferCache.resize(width * height * RGBA_NUM, 0);
 }
 
-void Canvas::Draw()
+void Canvas::Draw(std::vector<uint8_t> &framebuffer)
 {
-    std::ofstream imageFile("output.ppm");
+    const math::Vector3 cameraCenter = camera.GetCameraCenter();
+    const size_t pixelCount = width * height;
 
-    // PPM header
-    imageFile << "P3\n"
-              << m_Width << ' ' << m_Height << "\n255\n";
+    std::vector<size_t> indices(pixelCount);
+    std::iota(indices.begin(), indices.end(), 0);
 
-    // Render the gradient
-    for (size_t j = 0; j < m_Height; j++)
+    std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t index)
+                  {
+        const size_t j = index / width;
+        const size_t i = index % width;
+
+        math::Vector3 pixelCenter = pixelPosition + (i * pixelDeltaU) + (j * pixelDeltaV);
+        math::Vector3 rayDirection = pixelCenter - cameraCenter;
+
+        Ray ray(cameraCenter, rayDirection);
+        math::Vector3 color = RayColor(ray, bounces);
+
+        uint8_t r = static_cast<uint8_t>(std::clamp(color.x, 0.0f, 1.0f) * 255.999f);
+        uint8_t g = static_cast<uint8_t>(std::clamp(color.y, 0.0f, 1.0f) * 255.999f);
+        uint8_t b = static_cast<uint8_t>(std::clamp(color.z, 0.0f, 1.0f) * 255.999f);
+        uint8_t a = 255;
+
+        size_t pixelOffset = index * 4;
+        // order is b g r a
+        framebufferCache[pixelOffset + 0] += b;
+        framebufferCache[pixelOffset + 1] += g;
+        framebufferCache[pixelOffset + 2] += r;
+        framebufferCache[pixelOffset + 3] += a; 
+
+        framebuffer[pixelOffset + 0] = framebufferCache[pixelOffset + 0] / frameNum;
+        framebuffer[pixelOffset + 1] = framebufferCache[pixelOffset + 1] / frameNum;
+        framebuffer[pixelOffset + 2] = framebufferCache[pixelOffset + 2] / frameNum;
+        framebuffer[pixelOffset + 3] = framebufferCache[pixelOffset + 3] / frameNum;
+
+    });
+
+    frameNum++;
+}
+
+math::Vector3 Canvas::RayColor(const Ray &r, int bounces)
+{
+    if (bounces <= 0)
     {
-        for (size_t i = 0; i < m_Width; i++)
-        {
-            math::Vector3<float> pixelCenter = m_PixelPosition + (i * m_PixelDeltaU) + (j * m_PixelDeltaV);
-            math::Vector3<float> rayDirection = pixelCenter - m_Camera.GetCameraCenter();
-
-            Ray r(m_Camera.GetCameraCenter(), rayDirection);
-
-            math::Vector3<float> color = RayColor(r);
-            writeColor(imageFile, color);
-        }
+        return math::Vector3(0);
+    }
+    HitInfo rec;
+    if (world.Hit(r, Interval(0.001, infinity), rec))
+    {
+        math::Vector3 direction = math::random_on_hemisphere(rec.normal);
+        return 0.5 * RayColor(Ray(rec.point, direction), bounces - 1);
     }
 
-    // Close the file
-    imageFile.close();
-}
-
-void Canvas::writeColor(std::ofstream &file, const math::Vector3<float> &color)
-{
-    auto r = color.x;
-    auto g = color.y;
-    auto b = color.z;
-
-    // Translate the [0,1] component values to the byte range [0,255].
-    int rbyte = int(255.999 * r);
-    int gbyte = int(255.999 * g);
-    int bbyte = int(255.999 * b);
-
-    // Write out the pixel color components.
-    file << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
-}
-
-math::Vector3<float> Canvas::RayColor(const Ray &r)
-{
-    if (Renderer::Sphere(math::Vector3<float>(0, 0, -1), 0.5f, r))
-    {
-        return math::Vector3<float>(1.0f, 0.0f, 0.0f);
-    }
-
-    math::Vector3<float> unitDirection = r.GetDirection().Normalized();
-    float a = 0.5f * (unitDirection.y + 1.0f);
-
-    return (1.0f - a) * math::Vector3<float>(1.0f) + a * math::Vector3<float>(0.5f, 0.7f, 1.0f);
+    math::Vector3 unitDirection = r.GetDirection().Normalized();
+    auto a = 0.5 * (unitDirection.y + 1.0);
+    return (1.0 - a) * math::Vector3(1.0, 1.0, 1.0) + a * math::Vector3(0.5, 0.7, 1.0);
 }
