@@ -1,9 +1,9 @@
 #pragma once
+#ifdef _WIN32
 #include "Window.h"
 #ifndef UNICODE
 #define UNICODE
 #endif 
-#include <windows.h>
 #include "Canvas.h"
 
 class WindowsWindow : public Window
@@ -19,3 +19,5 @@ private:
     std::vector<uint8_t> pixelData; 
     void BlitToWindow(HDC hdc);
 };
+
+#endif

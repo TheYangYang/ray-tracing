@@ -10,7 +10,7 @@ public:
     {
         math::Vector3 origin = r.GetOrigin();
         math::Vector3 direction = r.GetDirection();
-        math::Vector3 &oc = center - origin;
+        math::Vector3 oc = center - origin;
 
         float a = math::dot(direction, direction);
         float b = -2.0 * (math::dot(direction, oc));

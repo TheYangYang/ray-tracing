@@ -1,3 +1,4 @@
+#ifdef _WIN32
 #include "platform/WindowsWindow.h"
 #define UNICODE
 
@@ -79,3 +80,6 @@ void WindowsWindow::BlitToWindow(HDC hdc)
 
     SetDIBitsToDevice(hdc, 0, 0, specification.width, specification.height, 0, 0, 0, specification.height, pixelData.data(), &bmi, DIB_RGB_COLORS);
 }
+
+#endif
+

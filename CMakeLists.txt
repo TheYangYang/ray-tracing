@@ -25,6 +25,10 @@ add_executable(rayTracingTests ${TEST_SOURCES})
 
 if (MSVC)
     set_target_properties(rayTracing PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
+elseif(UNIX)
+    find_package(X11 REQUIRED)
+    include_directories(${X11_INCLUDE_DIR})
+    target_link_libraries(rayTracing ${X11_LIBRARIES})
 endif()
 
 # Link libraries

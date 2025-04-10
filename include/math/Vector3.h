@@ -1,5 +1,8 @@
 #pragma once
 #include <iostream>
+#ifdef __linux__
+#include <cmath>
+#endif
 
 namespace math
 {

@@ -8,6 +8,14 @@
 #include <execution>
 #include <numeric>
 
+#ifdef _WIN32
+    #include <Window.h>
+#elif __linux__
+    #include <X11/Xlib.h>
+    #include <cstdint>
+#endif
+
+
 #include "math/Utils.h"
 #include "math/Vector3.h"
 
