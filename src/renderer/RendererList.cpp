@@ -1,28 +1,28 @@
 #include "renderer/RendererList.h"
 
-RendererList::RendererList(std::shared_ptr<Renderer> renderer)
+RendererList::RendererList(Ref<Renderer> renderer)
 {
     AddRenderer(renderer);
 }
 
-void RendererList::AddRenderer(std::shared_ptr<Renderer> renderer)
+void RendererList::AddRenderer(Ref<Renderer> renderer)
 {
     renderers.push_back(renderer);
 }
 
-bool RendererList::Hit(const Ray& ray, float rayTMin, float rayTMax, HitInfo& info) const 
+bool RendererList::Hit(const Ray& ray, Interval rayT, HitInfo& hitInfo) const 
 {
     HitInfo tempHitInfo;
     bool isHitting = false;
-    float closest = rayTMax;
+    float closest = rayT.GetMax();
 
     for(const auto& renderer: renderers)
     {
-        if(renderer->Hit(ray, rayTMin, closest, tempHitInfo))
+        if(renderer->Hit(ray, Interval(rayT.GetMin(), closest), tempHitInfo))
         {
             isHitting = true;
             closest = tempHitInfo.t;
-            info = tempHitInfo;
+            hitInfo = tempHitInfo;
         }
     }
 

@@ -1,18 +1,10 @@
 #pragma once
-#include "Vector3.h"
+
 namespace math
 {
-
-    static float dot(const Vector3 &first, const Vector3 &second)
+    static float randomFloat(float min, float max)
     {
-        return first.x * second.x + first.y * second.y + first.z * second.z;
+        return min + static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (max - min);
     }
 
-    static Vector3 cross(const Vector3 &first, const Vector3 &second) 
-    {
-        return Vector3(
-            first.y * second.z - first.z * second.y,
-            first.z * second.x - first.x * second.z,
-            first.x * second.y - first.y * second.x);
-    }
 }

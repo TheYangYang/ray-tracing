@@ -5,13 +5,13 @@
 class RendererList : public Renderer
 {
 public:
-    using RendererVector = std::vector<std::shared_ptr<Renderer>>;
-    RendererVector renderers;
 
     RendererList() = default;
-    RendererList(std::shared_ptr<Renderer> renderer);
+    RendererList(Ref<Renderer> renderer);
     ~RendererList() = default;
 
-    void AddRenderer(std::shared_ptr<Renderer> renderer);
-    bool Hit(const Ray &ray, float rayTMin, float rayTMax, HitInfo &info) const override;
+    void AddRenderer(Ref<Renderer> renderer);
+    bool Hit(const Ray &ray, Interval rayT, HitInfo &hitInfo) const override;
+private:
+    std::vector<Ref<Renderer>> renderers;
 };

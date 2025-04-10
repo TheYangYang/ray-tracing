@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Ray.h"
+#include "Interval.h"
 
 struct HitInfo
 {
@@ -22,5 +23,5 @@ class Renderer
 public:
     Renderer() = default;
     virtual ~Renderer() = default;
-    virtual bool Hit(const Ray& ray, float rayTMin, float rayTMax, HitInfo& hitInfo) const = 0;
+    virtual bool Hit(const Ray& ray, Interval rayT, HitInfo& hitInfo) const = 0;
 };
