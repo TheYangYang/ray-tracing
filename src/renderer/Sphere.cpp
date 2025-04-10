@@ -5,7 +5,7 @@ Sphere::Sphere(const math::Vector3 &center, float radius)
 {
 }
 
-bool Sphere::Hit(const Ray &ray, float rayTMin, float rayTMax, HitInfo &info) const
+bool Sphere::Hit(const Ray &ray, Interval rayT, HitInfo &info) const
 {
     math::Vector3 oc = center - ray.GetOrigin();
     float a = math::dot(ray.GetDirection(), ray.GetDirection());
@@ -22,15 +22,14 @@ bool Sphere::Hit(const Ray &ray, float rayTMin, float rayTMax, HitInfo &info) co
 
     // Calculate nearest root that lies in the acceptable range
     float root = (h - sqrtDiscriminant) / a;
-    if (root <= rayTMin || root >= rayTMax)
+    if (!rayT.Surrounds(root))
     {
         root = (h + sqrtDiscriminant) / a;
-        if (root <= rayTMin || rayTMax <= root)
+        if (!rayT.Surrounds(root))
         {
             return false;
         }
     }
-
 
     info.t = root;
     info.point = ray.At(info.t); // Get hit point

@@ -1,8 +1,10 @@
 #pragma once
 #include "pch.h"
-#include "math/Vector3.h"
 #include "Camera.h"
 #include "Ray.h"
+
+#include "renderer/RendererList.h"
+#include "renderer/Sphere.h"
 
 class Canvas
 {
@@ -20,7 +22,7 @@ public:
     Canvas &operator=(const Canvas &) = delete;
     Canvas(const Canvas &) = delete;
 
-    math::Vector3 RayColor(const Ray &r);
+    math::Vector3 RayColor(const Ray &r, int bounces);
 
 public:
     uint32_t width;
@@ -38,4 +40,13 @@ public:
     Camera camera;
 
     math::Vector3 pixelPosition;
+
+
+    RendererList world;
+
+    int bounces = 5;
+
+    std::vector<uint32_t> framebufferCache;
+    int frameNum = 1;
+
 };

@@ -18,10 +18,17 @@
 #include <cstdint>
 #endif
 
-#include "math/Utils.h"
 #include "math/Vector3.h"
+#include "math/Formula.h"
 
 #define RGBA_NUM 4
+
+const float infinity = std::numeric_limits<float>::infinity();
+const float pi = 3.1415926535897932385;
+
+inline float degreesToRadians(float degrees) {
+    return degrees * pi / 180.0;
+}
 
 template <typename T>
 using Ref = std::shared_ptr<T>;
@@ -43,3 +50,5 @@ Scope<T> CreateScope(Args &&...args)
 
 #define REF(type, ...) CreateRef<type>(__VA_ARGS__)
 #define SCOPE(type, ...) CreateScope<type>(__VA_ARGS__)
+
+#define REF_AS(Base, Derived, ...) std::static_pointer_cast<Base>(REF(Derived, __VA_ARGS__))

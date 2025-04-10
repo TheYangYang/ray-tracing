@@ -1,5 +1,5 @@
 #include "math/Vector3.h"
-#include "math/Utils.h"
+#include "math/Formula.h"
 #include <iostream>
 
 bool Equal(float a, float b, float epsilon = static_cast<float>(1e-5))

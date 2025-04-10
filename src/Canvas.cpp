@@ -1,6 +1,4 @@
 #include "Canvas.h"
-#include <fstream>
-#include "Renderer.h"
 
 Canvas &Canvas::GetInstance()
 {
@@ -26,6 +24,12 @@ void Canvas::Initialize(uint32_t width, uint32_t height, Camera camera)
 
     math::Vector3 viewportUpperLeft = camera.GetCameraCenter() - math::Vector3(0, 0, camera.GetFocalLength()) - viewportU / 2 - viewportV / 2;
     pixelPosition = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
+
+    // Initialize the world
+    world.AddRenderer(REF_AS(Renderer, Sphere, math::Vector3(0, 0, -1), 0.5f));
+    world.AddRenderer(REF_AS(Renderer, Sphere, math::Vector3(0, -100.5, -1), 100));
+
+    framebufferCache.resize(width * height * RGBA_NUM, 0);
 }
 
 void Canvas::Draw(std::vector<uint8_t> &framebuffer)
@@ -45,7 +49,7 @@ void Canvas::Draw(std::vector<uint8_t> &framebuffer)
         math::Vector3 rayDirection = pixelCenter - cameraCenter;
 
         Ray ray(cameraCenter, rayDirection);
-        math::Vector3 color = RayColor(ray);
+        math::Vector3 color = RayColor(ray, bounces);
 
         uint8_t r = static_cast<uint8_t>(std::clamp(color.x, 0.0f, 1.0f) * 255.999f);
         uint8_t g = static_cast<uint8_t>(std::clamp(color.y, 0.0f, 1.0f) * 255.999f);
@@ -54,19 +58,32 @@ void Canvas::Draw(std::vector<uint8_t> &framebuffer)
 
         size_t pixelOffset = index * 4;
         // order is b g r a
-        framebuffer[pixelOffset + 0] = b;
-        framebuffer[pixelOffset + 1] = g;
-        framebuffer[pixelOffset + 2] = r;
-        framebuffer[pixelOffset + 3] = a; });
+        framebufferCache[pixelOffset + 0] += b;
+        framebufferCache[pixelOffset + 1] += g;
+        framebufferCache[pixelOffset + 2] += r;
+        framebufferCache[pixelOffset + 3] += a; 
+
+        framebuffer[pixelOffset + 0] = framebufferCache[pixelOffset + 0] / frameNum;
+        framebuffer[pixelOffset + 1] = framebufferCache[pixelOffset + 1] / frameNum;
+        framebuffer[pixelOffset + 2] = framebufferCache[pixelOffset + 2] / frameNum;
+        framebuffer[pixelOffset + 3] = framebufferCache[pixelOffset + 3] / frameNum;
+
+    });
+
+    frameNum++;
 }
 
-math::Vector3 Canvas::RayColor(const Ray &r)
+math::Vector3 Canvas::RayColor(const Ray &r, int bounces)
 {
-    float t = Renderer::Sphere(math::Vector3(0, 0, -1), 0.5, r);
-    if (t > 0.0)
+    if (bounces <= 0)
     {
-        math::Vector3 N = (r.At(t) - math::Vector3(0, 0, -1)).Normalized();
-        return 0.5 * math::Vector3(N.x + 1, N.y + 1, N.z + 1);
+        return math::Vector3(0);
+    }
+    HitInfo rec;
+    if (world.Hit(r, Interval(0.001, infinity), rec))
+    {
+        math::Vector3 direction = math::random_on_hemisphere(rec.normal);
+        return 0.5 * RayColor(Ray(rec.point, direction), bounces - 1);
     }
 
     math::Vector3 unitDirection = r.GetDirection().Normalized();

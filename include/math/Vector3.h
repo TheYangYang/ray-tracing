@@ -3,6 +3,7 @@
 #ifdef __linux__
 #include <cmath>
 #endif
+#include "Utils.h"
 
 namespace math
 {
@@ -32,6 +33,15 @@ namespace math
         Vector3 operator-() const noexcept
         {
             return Vector3(-x, -y, -z);
+        }
+
+        static Vector3 random(float min, float max)
+        {
+            return Vector3(
+                randomFloat(min, max),
+                randomFloat(min, max),
+                randomFloat(min, max)
+            );
         }
 
         Vector3 operator+(const Vector3 &other) const noexcept
