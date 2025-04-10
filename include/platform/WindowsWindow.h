@@ -1,15 +1,12 @@
 #pragma once
 #ifdef _WIN32
 #include "Window.h"
-#ifndef UNICODE
-#define UNICODE
-#endif 
 #include "Canvas.h"
 
-class WindowsWindow : public Window
+class WindowsWindow : public platform::Window
 {
 public:
-    WindowsWindow(uint32_t width, uint32_t height, const std::wstring &title, Platform platform);
+    WindowsWindow(uint32_t width, uint32_t height, const std::wstring &title, platform::Platform platform);
     void Run() override;
 
 private:

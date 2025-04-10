@@ -1,8 +1,7 @@
 #ifdef _WIN32
 #include "platform/WindowsWindow.h"
-#define UNICODE
 
-WindowsWindow::WindowsWindow(uint32_t width, uint32_t height, const std::wstring &title, Platform platform)
+WindowsWindow::WindowsWindow(uint32_t width, uint32_t height, const std::wstring &title, platform::Platform platform)
     : Window(width, height, title, platform), pixelData(width * height * RGBA_NUM)
 {
     Canvas::GetInstance().Initialize(width, height, Camera());

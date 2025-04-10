@@ -12,11 +12,11 @@ if not exist "%BUILD_DIR%" (
 
 cd "%BUILD_DIR%"
 
-echo Configuring project with CMake (Release mode)...
-cmake -DCMAKE_BUILD_TYPE=Release ..
+echo Configuring project with CMake (Debug mode)...
+cmake -DCMAKE_BUILD_TYPE=Debug ..
 
 echo Building project...
-cmake --build . --config Release
+cmake --build . --config Debug
 
 echo Build completed successfully.
 pause

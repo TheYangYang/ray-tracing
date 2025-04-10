@@ -1,3 +1,4 @@
+#pragma once
 #ifdef __linux__
 #include "pch.h"
 #include "Window.h"

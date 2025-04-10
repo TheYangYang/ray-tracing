@@ -9,12 +9,14 @@
 #include <numeric>
 
 #ifdef _WIN32
-    #include <Window.h>
+#ifndef UNICODE
+#define UNICODE
+#endif 
+#include <windows.h>
 #elif __linux__
-    #include <X11/Xlib.h>
-    #include <cstdint>
+#include <X11/Xlib.h>
+#include <cstdint>
 #endif
-
 
 #include "math/Utils.h"
 #include "math/Vector3.h"

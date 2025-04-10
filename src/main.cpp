@@ -7,7 +7,7 @@ const std::wstring TITLE = L"Ray-Tracing";
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int)
 {
-    Scope<Window> window = SCOPE(WindowsWindow, WIDTH, HEIGHT, TITLE, Platform::WINDOWS);
+    Scope<platform::Window> window = SCOPE(WindowsWindow, WIDTH, HEIGHT, TITLE, platform::Platform::WINDOWS);
     window->Run();
     return 0;
 }
