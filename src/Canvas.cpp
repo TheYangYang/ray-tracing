@@ -26,8 +26,8 @@ void Canvas::Initialize(uint32_t width, uint32_t height, Camera camera)
     pixelPosition = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
 
     // Initialize the world
-    world.AddRenderer(REF_AS(Renderer, Sphere, math::Vector3(0, 0, -1), 0.5f));
-    world.AddRenderer(REF_AS(Renderer, Sphere, math::Vector3(0, -100.5, -1), 100));
+    world.AddRenderer(REF(RendererWrapper, REF(Sphere, math::Vector3(0, 0, -1), 0.5f, math::Vector3(1.0f, 0.0f, 0.0f))));
+    world.AddRenderer(REF(RendererWrapper, REF(Sphere, math::Vector3(0, -100.5, -1), 100, math::Vector3(0.0f, 1.0f, 0.0f))));
 
     framebufferCache.resize(width * height * RGBA_NUM, 0);
 }
@@ -42,33 +42,36 @@ void Canvas::Draw(std::vector<uint8_t> &framebuffer)
 
     std::for_each(std::execution::par, indices.begin(), indices.end(), [&](size_t index)
                   {
-        const size_t j = index / width;
-        const size_t i = index % width;
+                      const size_t j = index / width;
+                      const size_t i = index % width;
 
-        math::Vector3 pixelCenter = pixelPosition + (i * pixelDeltaU) + (j * pixelDeltaV);
-        math::Vector3 rayDirection = pixelCenter - cameraCenter;
+                      math::Vector3 pixelCenter = pixelPosition + (i * pixelDeltaU) + (j * pixelDeltaV);
+                      math::Vector3 rayDirection = pixelCenter - cameraCenter;
 
-        Ray ray(cameraCenter, rayDirection);
-        math::Vector3 color = RayColor(ray, bounces);
+                      Ray ray(cameraCenter, rayDirection);
+                      math::Vector3 color = RayColor(ray, bounces);
 
-        uint8_t r = static_cast<uint8_t>(std::clamp(color.x, 0.0f, 1.0f) * 255.999f);
-        uint8_t g = static_cast<uint8_t>(std::clamp(color.y, 0.0f, 1.0f) * 255.999f);
-        uint8_t b = static_cast<uint8_t>(std::clamp(color.z, 0.0f, 1.0f) * 255.999f);
-        uint8_t a = 255;
+                      // Gamma correction
+                      color.x = math::linearToGamma(color.x);
+                      color.y = math::linearToGamma(color.y);
+                      color.z = math::linearToGamma(color.z);
 
-        size_t pixelOffset = index * 4;
-        // order is b g r a
-        framebufferCache[pixelOffset + 0] += b;
-        framebufferCache[pixelOffset + 1] += g;
-        framebufferCache[pixelOffset + 2] += r;
-        framebufferCache[pixelOffset + 3] += a; 
+                      uint8_t r = static_cast<uint8_t>(std::clamp(color.x, 0.0f, 1.0f) * 255.999f);
+                      uint8_t g = static_cast<uint8_t>(std::clamp(color.y, 0.0f, 1.0f) * 255.999f);
+                      uint8_t b = static_cast<uint8_t>(std::clamp(color.z, 0.0f, 1.0f) * 255.999f);
+                      uint8_t a = 255;
 
-        framebuffer[pixelOffset + 0] = framebufferCache[pixelOffset + 0] / frameNum;
-        framebuffer[pixelOffset + 1] = framebufferCache[pixelOffset + 1] / frameNum;
-        framebuffer[pixelOffset + 2] = framebufferCache[pixelOffset + 2] / frameNum;
-        framebuffer[pixelOffset + 3] = framebufferCache[pixelOffset + 3] / frameNum;
+                      size_t pixelOffset = index * 4;
+                      // order is b g r a
+                      framebufferCache[pixelOffset + 0] += b;
+                      framebufferCache[pixelOffset + 1] += g;
+                      framebufferCache[pixelOffset + 2] += r;
+                      framebufferCache[pixelOffset + 3] += a;
 
-    });
+                      framebuffer[pixelOffset + 0] = framebufferCache[pixelOffset + 0] / frameNum;
+                      framebuffer[pixelOffset + 1] = framebufferCache[pixelOffset + 1] / frameNum;
+                      framebuffer[pixelOffset + 2] = framebufferCache[pixelOffset + 2] / frameNum;
+                      framebuffer[pixelOffset + 3] = framebufferCache[pixelOffset + 3] / frameNum; });
 
     frameNum++;
 }
@@ -83,7 +86,7 @@ math::Vector3 Canvas::RayColor(const Ray &r, int bounces)
     if (world.Hit(r, Interval(0.001, infinity), rec))
     {
         math::Vector3 direction = math::random_on_hemisphere(rec.normal);
-        return 0.5 * RayColor(Ray(rec.point, direction), bounces - 1);
+        return 0.7 * RayColor(Ray(rec.point, direction), bounces - 1);
     }
 
     math::Vector3 unitDirection = r.GetDirection().Normalized();

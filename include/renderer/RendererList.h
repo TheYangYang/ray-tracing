@@ -1,17 +1,17 @@
 #pragma once
 #include "pch.h"
 #include "renderer/Renderer.h"
+#include "renderer/RendererWrapper.h"
 
-class RendererList : public Renderer
+class RendererList
 {
 public:
-
     RendererList() = default;
-    RendererList(Ref<Renderer> renderer);
+    RendererList(Ref<RendererWrapper> renderer);
     ~RendererList() = default;
 
-    void AddRenderer(Ref<Renderer> renderer);
-    bool Hit(const Ray &ray, Interval rayT, HitInfo &hitInfo) const override;
+    void AddRenderer(Ref<RendererWrapper> renderer);
+    bool Hit(const Ray &ray, Interval rayT, HitInfo &hitInfo) const;
 private:
-    std::vector<Ref<Renderer>> renderers;
+    std::vector<Ref<RendererWrapper>> renderers;
 };
