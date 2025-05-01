@@ -1,11 +1,11 @@
 #include "renderer/RendererList.h"
 
-RendererList::RendererList(Ref<Renderer> renderer)
+RendererList::RendererList(Ref<RendererWrapper> renderer)
 {
     AddRenderer(renderer);
 }
 
-void RendererList::AddRenderer(Ref<Renderer> renderer)
+void RendererList::AddRenderer(Ref<RendererWrapper> renderer)
 {
     renderers.push_back(renderer);
 }

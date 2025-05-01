@@ -1,8 +1,9 @@
 #include "renderer/Sphere.h"
 
-Sphere::Sphere(const math::Vector3 &center, float radius)
+Sphere::Sphere(const math::Vector3 &center, float radius, const math::Vector3& albedo)
     : center(center), radius(radius)
 {
+    this->albedo = albedo;
 }
 
 bool Sphere::Hit(const Ray &ray, Interval rayT, HitInfo &info) const
@@ -35,6 +36,7 @@ bool Sphere::Hit(const Ray &ray, Interval rayT, HitInfo &info) const
     info.point = ray.At(info.t); // Get hit point
     math::Vector3 outNormal = (info.point - center) / radius;
     info.SetFaceNormal(ray, outNormal);
+    info.renderer = this;
 
     return true;
 }

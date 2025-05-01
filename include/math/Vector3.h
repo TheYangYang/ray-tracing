@@ -19,7 +19,7 @@ namespace math
             struct
             {
                 float r, g, b;
-            }; 
+            };
         };
 
         Vector3() noexcept : x(0), y(0), z(0) {};
@@ -40,8 +40,7 @@ namespace math
             return Vector3(
                 randomFloat(min, max),
                 randomFloat(min, max),
-                randomFloat(min, max)
-            );
+                randomFloat(min, max));
         }
 
         Vector3 operator+(const Vector3 &other) const noexcept
@@ -62,6 +61,11 @@ namespace math
         Vector3 operator*(const float scalar) const noexcept
         {
             return Vector3(x * scalar, y * scalar, z * scalar);
+        }
+
+        Vector3 operator*(const Vector3 &other) const
+        {
+            return math::Vector3(x * other.x, y * other.y, z * other.z);
         }
 
         friend Vector3 operator*(const float scalar, const Vector3 &v) noexcept
